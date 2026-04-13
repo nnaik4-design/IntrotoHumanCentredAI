@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=400">
+  <title>NetGuardians</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L3 7v6c0 5.25 3.83 10.15 9 11.25C17.17 23.15 21 18.25 21 13V7l-9-5z" fill="#2563eb"/>
+          <path d="M12 2L3 7v6c0 5.25 3.83 10.15 9 11.25C17.17 23.15 21 18.25 21 13V7l-9-5z" fill="none" stroke="#1d4ed8" stroke-width="1"/>
+          <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1>NetGuardians</h1>
+        <span class="header-subtitle" id="siteHostname">Analyzing...</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="settingsBtn" title="Settings & Whitelist">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div id="loadingState" class="loading-state">
+    <div class="spinner"></div>
+    <p>Analyzing this site...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div id="mainContent" class="main-content" style="display:none;">
+    <!-- Navigation Tabs -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="summary">Summary</button>
+      <button class="tab" data-tab="trackers">Trackers</button>
+      <button class="tab" data-tab="credibility">Credibility</button>
+      <button class="tab" data-tab="whitelist">Whitelist</button>
+      <button class="tab" data-tab="transparency">About</button>
+    </nav>
+
+    <!-- ═══ TAB 1: Risk Summary Card ═══ -->
+    <section id="tab-summary" class="tab-content active">
+      <!-- Risk Level Banner -->
+      <div class="risk-banner" id="riskBanner">
+        <div class="risk-icon" id="riskIcon"></div>
+        <div class="risk-info">
+          <div class="risk-level-label" id="riskLevelLabel">Analyzing...</div>
+          <div class="risk-score-bar">
+            <div class="risk-score-fill" id="riskScoreFill"></div>
+          </div>
+          <div class="risk-score-text" id="riskScoreText"></div>
+        </div>
+      </div>
+
+      <!-- Headline -->
+      <div class="card headline-card" id="headlineCard">
+        <h2 id="riskHeadline">Loading...</h2>
+      </div>
+
+      <!-- Rationale -->
+      <div class="card">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>What we found</span>
+        </div>
+        <p class="rationale-text" id="rationaleText">Analyzing page...</p>
+      </div>
+
+      <!-- Recommendation -->
+      <div class="card recommendation-card" id="recommendationCard">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span>Recommended action</span>
+        </div>
+        <p class="recommendation-text" id="recommendationText">Loading...</p>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="statTrackers">-</div>
+          <div class="stat-label">Trackers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statCompanies">-</div>
+          <div class="stat-label">Companies</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statCookies">-</div>
+          <div class="stat-label">Cookies</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statReplay">-</div>
+          <div class="stat-label">Session Replay</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ TAB 2: Trackers Detail ═══ -->
+    <section id="tab-trackers" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Data Collection Breakdown</span>
+        </div>
+        <p class="section-description">Here's exactly what this site is collecting and who receives your data.</p>
+      </div>
+
+      <!-- Analytics -->
+      <div class="tracker-category" id="analyticsSection">
+        <div class="category-header">
+          <span class="category-badge analytics">Analytics</span>
+          <span class="category-count" id="analyticsCount">0</span>
+        </div>
+        <div class="tracker-list" id="analyticsList"></div>
+      </div>
+
+      <!-- Advertising -->
+      <div class="tracker-category" id="advertisingSection">
+        <div class="category-header">
+          <span class="category-badge advertising">Advertising</span>
+          <span class="category-count" id="advertisingCount">0</span>
+        </div>
+        <div class="tracker-list" id="advertisingList"></div>
+      </div>
+
+      <!-- Fingerprinting -->
+      <div class="tracker-category" id="fingerprintingSection">
+        <div class="category-header">
+          <span class="category-badge fingerprinting">Fingerprinting</span>
+          <span class="category-count" id="fingerprintingCount">0</span>
+        </div>
+        <div class="tracker-list" id="fingerprintingList"></div>
+      </div>
+
+      <!-- Session Replay -->
+      <div class="tracker-category" id="replaySection">
+        <div class="category-header">
+          <span class="category-badge replay">Session Replay</span>
+          <span class="category-count" id="replayCount">0</span>
+        </div>
+        <div class="tracker-list" id="replayList"></div>
+      </div>
+
+      <!-- Cookies -->
+      <div class="tracker-category" id="cookiesSection">
+        <div class="category-header">
+          <span class="category-badge cookies">Tracking Cookies</span>
+          <span class="category-count" id="cookiesCount">0</span>
+        </div>
+        <div class="tracker-list" id="cookiesList"></div>
+      </div>
+
+      <!-- No trackers message -->
+      <div class="card no-trackers" id="noTrackersMsg" style="display:none;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5">
+          <path d="M12 2L3 7v6c0 5.25 3.83 10.15 9 11.25C17.17 23.15 21 18.25 21 13V7l-9-5z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+        <p>No significant trackers detected on this page.</p>
+      </div>
+    </section>
+
+    <!-- ═══ TAB 3: Credibility ═══ -->
+    <section id="tab-credibility" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Site Credibility Assessment</span>
+        </div>
+        <p class="section-description">We check for signs that this site might be untrustworthy or attempting to deceive you.</p>
+      </div>
+
+      <!-- Credibility Score -->
+      <div class="credibility-score-container" id="credScoreContainer">
+        <div class="credibility-gauge">
+          <div class="credibility-gauge-fill" id="credGaugeFill"></div>
+        </div>
+        <div class="credibility-label" id="credLabel">Checking...</div>
+      </div>
+
+      <!-- Warnings List -->
+      <div class="warnings-list" id="credWarningsList"></div>
+
+      <!-- No warnings message -->
+      <div class="card no-warnings" id="noWarningsMsg" style="display:none;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/>
+        </svg>
+        <p>No credibility concerns detected. This appears to be a legitimate site.</p>
+      </div>
+    </section>
+
+    <!-- ═══ TAB 4: Whitelist ═══ -->
+    <section id="tab-whitelist" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M12 2L3 7v6c0 5.25 3.83 10.15 9 11.25C17.17 23.15 21 18.25 21 13V7l-9-5z"/></svg>
+          <span>Trusted Sites</span>
+        </div>
+        <p class="section-description">Sites on your whitelist won't trigger analysis or warnings. Add sites you visit frequently and trust.</p>
+      </div>
+
+      <!-- Add current site -->
+      <div class="whitelist-add">
+        <button class="btn btn-primary" id="addWhitelistBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add current site to whitelist
+        </button>
+        <span class="whitelist-current" id="whitelistCurrentSite"></span>
+      </div>
+
+      <!-- Whitelist items -->
+      <div class="whitelist-items" id="whitelistItems">
+        <div class="whitelist-empty" id="whitelistEmpty">
+          <p>No sites whitelisted yet. Add trusted sites you visit often to reduce unnecessary alerts.</p>
+        </div>
+      </div>
+
+      <!-- Demo Mode Toggle -->
+      <div class="card demo-card">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>Demo Mode</span>
+        </div>
+        <p class="section-description">When enabled, visiting special demo URLs will show preset risk scenarios for testing.</p>
+        <div class="toggle-row">
+          <label class="toggle">
+            <input type="checkbox" id="demoModeToggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span>Enable demo mode</span>
+        </div>
+        <div class="demo-urls">
+          <p class="demo-label">Demo URLs to test:</p>
+          <code>example.com</code> — Safe (Green)<br>
+          <code>demo-newssite.example</code> — Moderate (Yellow)<br>
+          <code>secure-banking-login.example</code> — High Risk (Red)
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ TAB 5: Self-Transparency ═══ -->
+    <section id="tab-transparency" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>About NetGuardians</span>
+        </div>
+        <p class="section-description">We believe you should know exactly what this extension does and doesn't do with your data.</p>
+      </div>
+
+      <div class="transparency-section">
+        <h3>What permissions does this extension use?</h3>
+        <div class="permission-item">
+          <span class="permission-name">Active Tab</span>
+          <span class="permission-why">To analyze the scripts, cookies, and trackers on the page you're currently viewing.</span>
+        </div>
+        <div class="permission-item">
+          <span class="permission-name">Storage</span>
+          <span class="permission-why">To save your whitelist and preferences locally on your device.</span>
+        </div>
+        <div class="permission-item">
+          <span class="permission-name">Tabs</span>
+          <span class="permission-why">To detect when you navigate to a new page and update the analysis.</span>
+        </div>
+      </div>
+
+      <div class="transparency-section">
+        <h3>Does my data leave my device?</h3>
+        <div class="transparency-answer safe">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M12 2L3 7v6c0 5.25 3.83 10.15 9 11.25C17.17 23.15 21 18.25 21 13V7l-9-5z"/><path d="M9 12l2 2 4-4"/></svg>
+          <p><strong>No.</strong> All analysis happens entirely within your browser. No browsing data, page content, or analysis results are ever sent to any external server. NetGuardians has no backend — everything runs locally.</p>
+        </div>
+      </div>
+
+      <div class="transparency-section">
+        <h3>What is stored on my device?</h3>
+        <p>Only two things are stored locally using Chrome's storage API:</p>
+        <div class="stored-item">Your whitelisted domains (so trusted sites aren't re-analyzed)</div>
+        <div class="stored-item">Your preference settings (demo mode on/off)</div>
+        <p class="transparency-note">Analysis results are temporary and cleared when you close the tab. No browsing history is recorded.</p>
+      </div>
+
+      <div class="transparency-section">
+        <h3>How does the analysis work?</h3>
+        <p>NetGuardians scans the page for browser-observable signals: third-party scripts, known tracker domains, cookies, session replay tools, and fingerprinting indicators. It compares these against a built-in database of known tracking companies and uses heuristic rules to generate a risk score and plain-language explanation.</p>
+      </div>
+
+      <div class="transparency-section">
+        <h3>Is the source code available?</h3>
+        <p>NetGuardians is an open project built for the Intro to Human-Centred AI course at Johns Hopkins University (EN.601.494). All code is inspectable in the extension files.</p>
+      </div>
+
+      <div class="footer-info">
+        <p>NetGuardians v1.0 &middot; Built by Nishanth Naik, Ying Liu, Kevin Wu</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- No data state -->
+  <div id="noDataState" class="no-data-state" style="display:none;">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
+      <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+    </svg>
+    <p>Can't analyze this page.</p>
+    <span class="no-data-hint">NetGuardians works on regular web pages. Try navigating to a website.</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
