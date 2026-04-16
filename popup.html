@@ -280,7 +280,7 @@
         <h3>Does my data leave my device?</h3>
         <div class="transparency-answer safe">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M12 2L3 7v6c0 5.25 3.83 10.15 9 11.25C17.17 23.15 21 18.25 21 13V7l-9-5z"/><path d="M9 12l2 2 4-4"/></svg>
-          <p><strong>No.</strong> All analysis happens entirely within your browser. No browsing data, page content, or analysis results are ever sent to any external server. NetGuardians has no backend — everything runs locally.</p>
+          <p><strong>Mostly no.</strong> All tracker detection and risk scoring happens entirely within your browser — no page content or raw browsing data is ever sent anywhere. The one exception is the optional <strong>AI Privacy Advisor</strong>: when you click "Ask AI", a short summary of the analysis results (risk score, tracker names, and domain) is sent to the Groq API to generate a plain-English explanation. No page content, cookies, or personal information is included. You are always in control — the AI feature only runs when you explicitly request it.</p>
         </div>
       </div>
 
@@ -294,7 +294,7 @@
 
       <div class="transparency-section">
         <h3>How does the analysis work?</h3>
-        <p>NetGuardians scans the page for browser-observable signals: third-party scripts, known tracker domains, cookies, session replay tools, and fingerprinting indicators. It compares these against a built-in database of known tracking companies and uses heuristic rules to generate a risk score and plain-language explanation.</p>
+        <p>NetGuardians scans the page for browser-observable signals: third-party scripts, known tracker domains, cookies, session replay tools, and fingerprinting indicators. It compares these against a built-in database of known tracking companies and uses heuristic rules to generate a risk score. Optionally, the AI Privacy Advisor feature sends a brief summary of these results to Groq's API (running Llama 3.3), which translates the findings into a plain-English explanation tailored to what was detected — reducing the cognitive effort required to understand your privacy exposure.</p>
       </div>
 
       <div class="transparency-section">

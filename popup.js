@@ -1,6 +1,10 @@
 // NetGuardians Popup Script
 // Handles all UI interactions, tab switching, and data rendering
 
+// ── AI Privacy Advisor config ─────────────────────────────────────────────
+// Replace with your Groq API key: https://console.groq.com/keys
+const GROQ_API_KEY = "YOUR_GROQ_API_KEY";
+
 document.addEventListener("DOMContentLoaded", () => {
   // ── Tab navigation ──────────────────────────────────────────────────────
   const tabs = document.querySelectorAll(".tab");
@@ -71,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCredibility(data);
     loadWhitelist();
     loadDemoMode();
+    enrichWithAI(data);
   }
 
   function renderSummary(data) {
@@ -325,6 +330,105 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ── Utility ─────────────────────────────────────────────────────────────
+
+  // ── AI Privacy Advisor ───────────────────────────────────────────────────
+
+  async function enrichWithAI(data) {
+    if (!GROQ_API_KEY || GROQ_API_KEY === "YOUR_GROQ_API_KEY") return;
+    if (data.isWhitelisted) return;
+
+    const rationaleEl = document.getElementById("rationaleText");
+    const recommendationEl = document.getElementById("recommendationText");
+    const fallbackRationale = rationaleEl.textContent;
+    const fallbackRecommendation = recommendationEl.textContent;
+
+    // Show loading state
+    rationaleEl.innerHTML = `<span class="ai-loading">AI is analyzing this site…</span>`;
+    recommendationEl.innerHTML = `<span class="ai-loading">Generating recommendation…</span>`;
+
+    // Build a compact context for the prompt
+    const analyticsTrackers = (data.trackers?.analytics || []).map((t) => `${t.company} ${t.type}: ${t.description}`);
+    const adTrackers = (data.trackers?.advertising || []).map((t) => `${t.company} ${t.type}: ${t.description}`);
+    const fpTrackers = (data.trackers?.fingerprinting || []).map((t) => `${t.company} ${t.type}: ${t.description}`);
+    const replayDetails = (data.sessionReplay || []).map((r) => `${r.name}: ${r.description}`);
+    const cookieDetails = (data.cookies?.tracking || []).map((c) => `${c.cookieName} (${c.company}): ${c.description}`);
+    const credWarnings = data.credibility?.warnings || [];
+    const hasFingerprint = data.canvasFingerprinting || (data.trackers?.fingerprinting?.length > 0);
+    const hiddenIframes = (data.thirdPartyIframes || []).filter((f) => f.hidden).map((f) => f.src);
+
+    const trackerBlock = [
+      analyticsTrackers.length ? `Analytics:\n  - ${analyticsTrackers.join("\n  - ")}` : "",
+      adTrackers.length ? `Advertising:\n  - ${adTrackers.join("\n  - ")}` : "",
+      fpTrackers.length ? `Fingerprinting:\n  - ${fpTrackers.join("\n  - ")}` : "",
+      replayDetails.length ? `Session Replay:\n  - ${replayDetails.join("\n  - ")}` : "",
+      cookieDetails.length ? `Tracking Cookies:\n  - ${cookieDetails.join("\n  - ")}` : "",
+      hiddenIframes.length ? `Hidden iframes from: ${hiddenIframes.join(", ")}` : ""
+    ].filter(Boolean).join("\n");
+
+    const prompt =
+      `You are a privacy analyst writing a scannable report for a non-technical user who just visited ${data.hostname}.\n\n` +
+      `DETECTED SIGNALS:\n` +
+      `- Risk Score: ${data.riskScore}/100 (${data.riskLevel})\n` +
+      `- Canvas Fingerprinting: ${hasFingerprint ? "yes" : "no"}\n` +
+      (credWarnings.length ? `- Domain Warnings: ${credWarnings.join("; ")}\n` : "") +
+      (trackerBlock ? `\n${trackerBlock}\n` : "\nNo trackers detected.\n") +
+      `\nReturn JSON with exactly two fields:\n` +
+      `1. "bullets": an array of 3-5 short bullet strings. Each bullet must:\n` +
+      `   - Be max 15 words\n` +
+      `   - Start with the company name wrapped like **Google**\n` +
+      `   - State ONE specific real-world consequence (what data they get, what they can do with it)\n` +
+      `   - Example: "**Criteo** tracks products you viewed to retarget you with ads on other sites"\n` +
+      `2. "recommendation": ONE sentence, max 20 words, specific to this site and these trackers.\n` +
+      `   Do NOT say "use an ad blocker" or "use a privacy browser".\n` +
+      `   Focus on: should the user log in / enter personal info / make purchases? What specific risk does THAT create here?\n\n` +
+      `Respond ONLY with valid JSON, no markdown fences: {"bullets": ["..."], "recommendation": "..."}`;
+
+    try {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${GROQ_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.4,
+          max_tokens: 350
+        })
+      });
+
+      if (!response.ok) throw new Error(`Groq API error: ${response.status}`);
+
+      const json = await response.json();
+      const rawContent = json.choices?.[0]?.message?.content || "";
+
+      // Extract JSON object from the response
+      const match = rawContent.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error("No JSON found in AI response");
+
+      const result = JSON.parse(match[0]);
+
+      if (Array.isArray(result.bullets) && result.bullets.length > 0) {
+        const items = result.bullets
+          .map((b) => {
+            // Convert **bold** markdown to <strong> tags
+            const safe = escapeHtml(b).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+            return `<li>${safe}</li>`;
+          })
+          .join("");
+        rationaleEl.innerHTML = `<ul class="ai-bullets ai-generated">${items}</ul>`;
+      }
+      if (result.recommendation) {
+        recommendationEl.innerHTML =
+          `<span class="ai-generated">${escapeHtml(result.recommendation)}</span>`;
+      }
+    } catch (_err) {
+      // Silently fall back to heuristic text on any error
+      rationaleEl.textContent = fallbackRationale;
+      recommendationEl.textContent = fallbackRecommendation;
+    }
+  }
 
   function showNoData() {
     document.getElementById("loadingState").style.display = "none";
