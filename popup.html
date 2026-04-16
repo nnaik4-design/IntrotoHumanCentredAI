@@ -104,6 +104,12 @@
           <div class="stat-label">Session Replay</div>
         </div>
       </div>
+
+      <!-- No API Key Notice -->
+      <div class="no-api-notice" id="noApiKeyNotice" style="display:none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <span>Showing rule-based analysis. For AI-powered insights, add your API key in the <button class="notice-link" id="goToAboutBtn">About</button> tab.</span>
+      </div>
     </section>
 
     <!-- ═══ TAB 2: Trackers Detail ═══ -->
@@ -258,6 +264,37 @@
           <span>About NetGuardians</span>
         </div>
         <p class="section-description">We believe you should know exactly what this extension does and doesn't do with your data.</p>
+      </div>
+
+      <!-- API Key Settings -->
+      <div class="card api-key-card">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+          </svg>
+          <span>AI Privacy Advisor — API Key</span>
+        </div>
+        <p class="section-description">Enter your API key to unlock AI-powered analysis on the Summary tab. The key is stored locally on your device only and never sent anywhere except the AI provider you choose.</p>
+        <div class="api-key-input-row">
+          <input type="password" id="apiKeyInput" class="api-key-input" placeholder="gsk_...">
+          <button class="btn btn-primary btn-sm" id="saveApiKeyBtn">Save</button>
+        </div>
+        <div class="api-key-status" id="apiKeyStatus"></div>
+        <div class="api-key-links">
+          <p class="api-key-links-label">Get a free API key:</p>
+          <a href="#" class="api-key-link" data-url="https://console.groq.com/keys">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Groq — free tier, very fast (recommended)
+          </a>
+          <a href="#" class="api-key-link" data-url="https://aistudio.google.com/app/apikey">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Google AI Studio — free Gemini key
+          </a>
+          <a href="#" class="api-key-link" data-url="https://platform.openai.com/api-keys">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            OpenAI Platform — GPT-4o mini (paid, low cost)
+          </a>
+        </div>
       </div>
 
       <div class="transparency-section">

@@ -2,8 +2,14 @@
 // Handles all UI interactions, tab switching, and data rendering
 
 // ── AI Privacy Advisor config ─────────────────────────────────────────────
-// Replace with your Groq API key: https://console.groq.com/keys
-const GROQ_API_KEY = "YOUR_GROQ_API_KEY";
+// API key is entered by the user via the Settings tab and stored locally.
+function getStoredApiKey() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get("groqApiKey", (result) => {
+      resolve(result.groqApiKey || "");
+    });
+  });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   // ── Tab navigation ──────────────────────────────────────────────────────
@@ -75,7 +81,15 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCredibility(data);
     loadWhitelist();
     loadDemoMode();
+    updateNoApiKeyNotice();
     enrichWithAI(data);
+  }
+
+  function updateNoApiKeyNotice() {
+    chrome.storage.local.get("groqApiKey", (result) => {
+      const hasKey = !!(result.groqApiKey);
+      document.getElementById("noApiKeyNotice").style.display = hasKey ? "none" : "flex";
+    });
   }
 
   function renderSummary(data) {
@@ -331,10 +345,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ── Utility ─────────────────────────────────────────────────────────────
 
+  // ── API key settings ─────────────────────────────────────────────────────
+
+  function loadApiKeySettings() {
+    chrome.storage.local.get("groqApiKey", (result) => {
+      const key = result.groqApiKey || "";
+      const input = document.getElementById("apiKeyInput");
+      const status = document.getElementById("apiKeyStatus");
+      if (key) {
+        input.value = key;
+        status.textContent = "API key configured ✓";
+        status.className = "api-key-status status-saved";
+      }
+    });
+  }
+
+  document.getElementById("saveApiKeyBtn").addEventListener("click", () => {
+    const key = document.getElementById("apiKeyInput").value.trim();
+    chrome.storage.local.set({ groqApiKey: key }, () => {
+      const status = document.getElementById("apiKeyStatus");
+      if (key) {
+        status.textContent = "API key saved ✓";
+        status.className = "api-key-status status-saved";
+      } else {
+        status.textContent = "API key removed.";
+        status.className = "api-key-status status-removed";
+      }
+      // Refresh the no-key notice on the Summary tab
+      updateNoApiKeyNotice();
+      setTimeout(() => {
+        status.textContent = key ? "API key configured ✓" : "";
+        if (!key) status.className = "api-key-status";
+      }, 2000);
+    });
+  });
+
+  // "About" shortcut button inside the no-API-key notice on Summary tab
+  document.getElementById("goToAboutBtn").addEventListener("click", () => {
+    tabs.forEach((t) => t.classList.remove("active"));
+    tabContents.forEach((tc) => tc.classList.remove("active"));
+    document.querySelector('[data-tab="transparency"]').classList.add("active");
+    document.getElementById("tab-transparency").classList.add("active");
+  });
+
+  // Open external links in a new tab (chrome.tabs.create needed inside extensions)
+  document.querySelectorAll(".api-key-link").forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      chrome.tabs.create({ url: link.dataset.url });
+    });
+  });
+
+  loadApiKeySettings();
+
   // ── AI Privacy Advisor ───────────────────────────────────────────────────
 
   async function enrichWithAI(data) {
-    if (!GROQ_API_KEY || GROQ_API_KEY === "YOUR_GROQ_API_KEY") return;
+    const GROQ_API_KEY = await getStoredApiKey();
+    if (!GROQ_API_KEY) return;
     if (data.isWhitelisted) return;
 
     const rationaleEl = document.getElementById("rationaleText");

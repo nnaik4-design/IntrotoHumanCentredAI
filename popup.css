@@ -643,6 +643,123 @@ body::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
   color: var(--red);
 }
 
+/* ── No API Key Notice (Summary tab) ──────────────────────────────────── */
+
+.no-api-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 12px 12px;
+  padding: 9px 12px;
+  background: var(--blue-bg);
+  border: 1px solid var(--blue-light);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--gray-600);
+  line-height: 1.4;
+}
+
+.no-api-notice svg {
+  flex-shrink: 0;
+  color: var(--blue);
+}
+
+.notice-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.notice-link:hover {
+  color: #1d4ed8;
+}
+
+/* ── API Key Card ──────────────────────────────────────────────────────── */
+
+.api-key-card {
+  background: var(--blue-bg);
+  border-color: var(--blue-light);
+}
+
+.api-key-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.api-key-input {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-family: monospace;
+  background: white;
+  color: var(--gray-800);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.api-key-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.12);
+}
+
+.btn-sm {
+  padding: 7px 14px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.api-key-status {
+  font-size: 11px;
+  margin-top: 6px;
+  min-height: 16px;
+  transition: color 0.2s;
+}
+
+.api-key-status.status-saved {
+  color: var(--green-dark);
+}
+
+.api-key-status.status-removed {
+  color: var(--gray-500);
+}
+
+.api-key-links {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--blue-light);
+}
+
+.api-key-links-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-600);
+  margin-bottom: 6px;
+}
+
+.api-key-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--blue);
+  text-decoration: none;
+  padding: 3px 0;
+  transition: color 0.15s;
+}
+
+.api-key-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
 /* ── Demo Card ─────────────────────────────────────────────────────────── */
 
 .demo-card {
